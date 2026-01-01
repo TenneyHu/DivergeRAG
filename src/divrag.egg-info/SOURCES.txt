@@ -1,0 +1,5 @@
+pyproject.toml
+src/divrag.egg-info/PKG-INFO
+src/divrag.egg-info/SOURCES.txt
+src/divrag.egg-info/dependency_links.txt
+src/divrag.egg-info/top_level.txt

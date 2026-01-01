@@ -1,0 +1,4 @@
+./src/divrag.egg-info/
+./src/__pycache__/
+./nohup.out
+./logs/
