@@ -18,6 +18,29 @@ DEFAULT_IGNORED_DOMAINS = [
     'instagram.com'
 ]
 
+import sys
+import json
+import subprocess
+import time
+import random
+import requests
+from urllib.parse import urlparse
+from bs4 import BeautifulSoup
+from tqdm import tqdm
+import logging
+
+DEFAULT_IGNORED_DOMAINS = [
+    "facebook.com",
+    "twitter.com",
+    "x.com",
+    "youtube.com",
+    "instagram.com",
+]
+
+# --------------------------------------------------
+# Google Search (SUBPROCESS SAFE)
+# --------------------------------------------------
+
 def google_search(
     query,
     num_results=5,
@@ -27,76 +50,76 @@ def google_search(
     logger=None,
 ):
     if logger is None:
-        import logging
         logger = logging.getLogger(__name__)
 
     if verbose:
-        logger.info(f"Searching Google for: {query}")
+        logger.info(f"[Search] {query}")
 
     results = []
     urls_processed = 0
 
     try:
-        with DDGS() as ddgs:
-            search_results = [r for r in ddgs.text(query, max_results=2 * num_results)]
-            for r in search_results:
-                url = r.get("href") or r.get("url")
-                if not url:
-                    logger.debug(f"Skipped malformed result: {r}")
-                    continue
+        cmd = [
+            sys.executable,
+            "./src/ddgs_search_once.py",        
+            query,
+            str(2 * num_results),
+        ]
 
-                urls_processed += 1
-                if verbose:
-                    logger.info(f"Found URL ({urls_processed}): {url}")
+        out = subprocess.check_output(
+            cmd,
+            text=True,
+            stderr=subprocess.STDOUT,
+        )
 
-                domain = urlparse(url).netloc.lower()
-                if any(domain == ignored or domain.endswith("." + ignored) for ignored in ignored_domains):
-                    if verbose:
-                        logger.debug(f"✗ Skipped: URL from ignored domain: {url}")
-                    continue
+        search_results = json.loads(out)
 
-                if url.lower().endswith(".pdf"):
-                    if verbose:
-                        logger.debug(f"✗ Skipped: PDF file: {url}")
-                    continue
+        for r in search_results:
+            url = r.get("href") or r.get("url")
+            if not url:
+                continue
 
-                if verbose:
-                    logger.info(f"Extracting content from: {url}")
+            urls_processed += 1
+            domain = urlparse(url).netloc.lower()
 
-                text = extract_text_from_url(url, verbose=False)
+            if any(
+                domain == ignored or domain.endswith("." + ignored)
+                for ignored in ignored_domains
+            ):
+                continue
 
-                if text and len(text) >= min_chars:
-                    results.append({
-                        "url": url,
-                        "text": text,
-                        "length": len(text),
-                    })
-                    if verbose:
-                        logger.info(f"✓ Added to results ({len(text)} characters)")
-                else:
-                    if verbose:
-                        if text:
-                            logger.debug(
-                                f"✗ Skipped: Content too short ({len(text)} characters)"
-                            )
-                        else:
-                            logger.debug("✗ Skipped: Failed to extract content")
+            if url.lower().endswith(".pdf"):
+                continue
 
-                time.sleep(random.uniform(1.0, 3.0))
+            text = extract_text_from_url(url, verbose=False)
 
-                if len(results) >= num_results:
-                    logger.info(f"Reached desired number of results: {num_results}")
-                    break
+            if text and len(text) >= min_chars:
+                results.append({
+                    "url": url,
+                    "text": text,
+                    "length": len(text),
+                })
 
+            time.sleep(random.uniform(1.0, 3.0))
+
+            if len(results) >= num_results:
+                break
+
+    except subprocess.CalledProcessError as e:
+        logger.error(f"DDGS subprocess failed:\n{e.output}")
     except Exception as e:
-        logger.exception(f"Error during Google search: {e}")
+        logger.exception(f"Search error: {e}")
 
     if verbose:
         logger.info(
-            f"Processed {urls_processed} URLs, found {len(results)} with sufficient content"
+            f"Processed {urls_processed} URLs, kept {len(results)}"
         )
 
     return results
+
+# --------------------------------------------------
+# HTML Content Extraction
+# --------------------------------------------------
 
 def extract_text_from_url(url, verbose=True):
     session = requests.Session()
@@ -123,8 +146,7 @@ def extract_text_from_url(url, verbose=True):
 
         if response.status_code == 403:
             if verbose:
-                print("403 Forbidden — likely blocked by anti-bot")
-                print(response.text[:500])
+                print(f"403 Forbidden: {url}")
             return ""
 
         soup = BeautifulSoup(response.text, "html.parser")
@@ -139,30 +161,44 @@ def extract_text_from_url(url, verbose=True):
 
     except Exception as e:
         if verbose:
-            print(f"Error extracting text from {url}: {e}")
+            print(f"Extraction error ({url}): {e}")
         return ""
 
-def process_queries_from_file(query_file, num_results=20, min_chars=32, ignored_domains=None, verbose=True):
+# --------------------------------------------------
+# Batch Processing
+# --------------------------------------------------
 
+def process_queries_from_file(
+    query_file,
+    num_results=20,
+    min_chars=32,
+    ignored_domains=DEFAULT_IGNORED_DOMAINS,
+    verbose=True,
+):
+    logger = logging.getLogger(__name__)
     all_results = {}
 
     try:
-        with open(query_file, 'r', encoding='utf-8') as f:
+        with open(query_file, "r", encoding="utf-8") as f:
             queries = [line.strip() for line in f if line.strip()]
 
-        if verbose:
-            print(f"Found {len(queries)} queries in {query_file}")
 
         for query in tqdm(queries):
-            results = google_search(query, num_results, min_chars, ignored_domains, verbose)
+            results = google_search(
+                query=query,
+                num_results=num_results,
+                min_chars=min_chars,
+                ignored_domains=ignored_domains,
+                verbose=verbose,
+                logger=logger,
+            )
             all_results[query] = results
-
-        return all_results
 
     except Exception as e:
         if verbose:
-            print(f"Error processing queries from file: {e}")
-        return all_results
+            print(f"Batch error: {e}")
+
+    return all_results
 
 def main():
     parser = argparse.ArgumentParser(description='Search Google and download text from result pages')

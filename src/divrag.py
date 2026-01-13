@@ -1,23 +1,25 @@
-from operator import index
-from search import google_search
-from logger import setup_debug_logger
-from prompt import *
-from llama_index.embeddings.openai import OpenAIEmbedding
-from llama_index.llms.anthropic import Anthropic
-from llama_index.core import VectorStoreIndex, Document, Settings, StorageContext, load_index_from_storage
 import hashlib
 import os
 import json
+import numpy as np
+from typing import List, Optional
+from pydantic import Field, PrivateAttr
+from operator import index
 from openai import OpenAI as OpenAIClient
+from llama_index.embeddings.openai import OpenAIEmbedding
+from llama_index.llms.anthropic import Anthropic
+from llama_index.core import VectorStoreIndex, Document, Settings, StorageContext, load_index_from_storage
 from llama_index.llms.openai import OpenAI
 from llama_index.core.prompts import PromptTemplate
 from llama_index.core.postprocessor.types import BaseNodePostprocessor
 from llama_index.core.schema import NodeWithScore, QueryBundle
-import numpy as np
-from typing import List, Optional
-from pydantic import Field, PrivateAttr
+from search import google_search
+from logger import setup_debug_logger
+from prompt import *
+import hashlib
+import threading
 
-QUERY_CACHE_DIR = "../cache/queries"
+QUERY_CACHE_DIR = "/dtu/p1/tianyhu/cache/queries"
 os.makedirs(QUERY_CACHE_DIR, exist_ok=True)
 
 def cosine_sim(a, b):
@@ -45,6 +47,26 @@ def parse_views(raw: str):
         print("Raw output:", raw)
         return None
     
+class EmbeddingCache:
+    """
+    Simple in-memory embedding cache.
+    Thread-safe and model-agnostic.
+    """
+    def __init__(self):
+        self._cache = {}
+        self._lock = threading.Lock()
+
+    def _key(self, text: str) -> str:
+        return hashlib.md5(text.encode("utf-8")).hexdigest()
+
+    def get(self, text: str, embed_model) -> np.ndarray:
+        key = self._key(text)
+        with self._lock:
+            if key not in self._cache:
+                emb = embed_model.get_text_embedding(text)
+                self._cache[key] = np.asarray(emb)
+            return self._cache[key]
+     
 class DivMemory:
     def __init__(self):
         self.queries = list()
@@ -86,8 +108,10 @@ class DivReranker(BaseNodePostprocessor):
     final_top_k: int = Field(description="Final number of nodes to return")
     alpha: float = Field(description="Relevance vs diversity trade-off")
     beta: float = Field(description="Penalty weight for historical similarity")
+
     _memory: DivMemory = PrivateAttr()
     _embed_model = PrivateAttr()
+    _emb_cache: EmbeddingCache = PrivateAttr()
 
     def __init__(
         self,
@@ -104,6 +128,7 @@ class DivReranker(BaseNodePostprocessor):
 
         self._memory = _memory
         self._embed_model = Settings.embed_model
+        self._emb_cache = EmbeddingCache()
 
 
     def _postprocess_nodes(
@@ -116,10 +141,11 @@ class DivReranker(BaseNodePostprocessor):
         selected: List[NodeWithScore] = []
         selected_emb: List[np.ndarray] = []
 
-        # --- batch embedding ---
-        texts = [nws.node.get_content() for nws in nodes]
-        embeddings = self._embed_model.get_text_embedding_batch(texts)
-        node2emb = {id(nws): np.asarray(emb) for nws, emb in zip(nodes, embeddings)}
+        # --- embedding via cache ---
+        node2emb = {}
+        for nws in nodes:
+            text = nws.node.get_content()
+            node2emb[id(nws)] = self._emb_cache.get(text, self._embed_model)
 
         previous_embeddings = [
             np.asarray(h)
@@ -184,7 +210,7 @@ class DivRAG:
         Settings.chunk_overlap = chunk_overlap
         Settings.embed_model = OpenAIEmbedding(model=embed_model)
         self.llm_model = llm_model
-        self.debug = debug
+        self.debug = True
         self.qid = qid
         self.logger = setup_debug_logger(
             log_dir="./logs",
@@ -198,35 +224,39 @@ class DivRAG:
         
 
     def step(self):
-
-        if self.debug:
-            logger_msg = f"QID: {self.qid}, Step: {self.steps}"
-            self.logger.debug(logger_msg)
-
-        if self.steps == 0:
-            self.memory.add_query(self.query)
-            index = self._search(self.query)
-            result = self._rag(index)
-            self.memory.add_result(result)
-            self.memory.set_views(self._summary_views())
+        try:
             if self.debug:
-                logger_msg = f"Initial views generated: {self.memory.views}"
-                self.logger.debug(logger_msg)
-        else:
-            new_view = self._generate_diverse_view()
-            new_query = self._generate_query_based_on_view(new_view)
-            index = self._search(new_query)
-            result = self._rag(index, new_view=new_view)
-            self.memory.add_query(new_query)
-            self.memory.add_view(new_view)
-            self.memory.add_result(result)
-            if self.debug:
-                logger_msg = f"New view generated: {new_view}"
-                self.logger.debug(logger_msg)
-                logger_msg = f"New query generated: {new_query}"
-                self.logger.debug(logger_msg)
+                self.logger.debug(f"QID: {self.qid}, Step: {self.steps}")
 
-        self.steps += 1
+            if self.steps == 0:
+                self.memory.add_query(self.query)
+
+                index = self._search(self.query)
+                result = self._rag(index)
+                result = self._refine(self.query, result, None)
+
+                self.memory.add_result(result)
+                self.memory.set_views(self._summary_views())
+
+            else:
+                new_view = self._generate_diverse_view()
+                new_query = self._generate_query_based_on_view(new_view)
+
+                index = self._search(new_query)
+                result = self._rag(index, new_view=new_view)
+                result = self._refine(self.query, result, new_view)
+
+                self.memory.add_query(new_query)
+                self.memory.add_view(new_view)
+                self.memory.add_result(result)
+
+        except Exception as e:
+            self.logger.warning(
+                f"[QID {self.qid}] Step {self.steps} failed: {type(e).__name__}: {e}"
+            )
+
+        finally:
+            self.steps += 1
 
     def run(self):
         while self.steps < self.max_generation_num:
@@ -274,6 +304,29 @@ class DivRAG:
         index.storage_context.persist(persist_dir=qdir)
 
         return index
+
+    def _refine(self, query, result, view):
+        if view is None:
+            prompt = refine_prompt_without_view.format(
+                QUESTION=query,
+                ANSWER=result
+            )
+        else:
+            prompt = refine_prompt_with_view.format(
+                QUESTION=query,
+                VIEW=view,
+                ANSWER=result
+            )
+
+        resp = self.client.chat.completions.create(
+            model=self.llm_model,
+            messages=[
+                {"role": "user", "content": prompt}
+            ]
+        )
+        ans = resp.choices[0].message.content.strip()
+
+        return ans
 
     def _rag(self, index: VectorStoreIndex, new_view: dict = None):
 

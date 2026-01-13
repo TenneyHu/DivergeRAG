@@ -43,8 +43,8 @@ def run_demo():
 
     nums_answers = 5
 
-    # Initialize DivRAG 
-    
+    # Initialize DivRAG
+
     div = DivRAG(
         query=query,
         qid=0,

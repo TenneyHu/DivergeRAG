@@ -1,4 +1,8 @@
 pyproject.toml
+src/baselines/closebook.py
+src/baselines/simple_rag.py
+src/baselines/simple_tests/dataset_test.py
+src/baselines/simple_tests/network_test.py
 src/divrag.egg-info/PKG-INFO
 src/divrag.egg-info/SOURCES.txt
 src/divrag.egg-info/dependency_links.txt
