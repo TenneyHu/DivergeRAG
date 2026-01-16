@@ -1,0 +1,188 @@
+[2026-01-16 21:55:28,572] [INFO] Parsed 98 QIDs from ./results/baselines/gpt-5-mini_vsampling.txt
+[2026-01-16 21:55:28,572] [INFO] Input File: gpt-5-mini_vsampling.txt, Prepared 1 queries for evaluation.
+[2026-01-16 21:55:33,397] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 21:55:34,113] [INFO] QID: 1, Extracted 1 claims from answer.
+[2026-01-16 21:55:34,341] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 21:55:34,499] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 21:55:34,705] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 21:55:34,963] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 21:55:36,384] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 21:55:37,309] [INFO] QID: 1, Extracted 1 claims from answer.
+[2026-01-16 21:55:37,520] [INFO] QID: 1, Extracted 1 claims from answer.
+[2026-01-16 21:55:38,523] [INFO] QID: 1, Extracted 1 claims from answer.
+[2026-01-16 21:55:39,435] [INFO] QID: 1, Start with 16 claims. Found 9 unique claims.
+[2026-01-16 21:55:45,679] [INFO] QID: 1, Verdict: Excellent (5), Reason: NONE
+[2026-01-16 21:55:46,285] [INFO] QID: 1, Verdict: Excellent (5), Reason: NONE
+[2026-01-16 21:55:50,113] [INFO] QID: 1, Verdict: Excellent (5), Reason: NONE
+[2026-01-16 21:55:50,881] [INFO] QID: 1, Verdict: Excellent (5), Reason: NONE
+[2026-01-16 21:55:52,104] [INFO] QID: 1, Verdict: Good (4), Reason: Misses nuances like differing redundancy/performance isolation benefits of separate pools.
+[2026-01-16 21:55:52,556] [INFO] QID: 1, Verdict: Good (4), Reason: Doesn’t discuss potential benefits of a separate pool’s isolation or redundancy choices.
+[2026-01-16 21:55:52,596] [INFO] QID: 1, Verdict: Good (4), Reason: Lacks specific pros/cons of separate pool versus additional backup.
+[2026-01-16 21:55:53,895] [INFO] QID: 1, Verdict: Good (4), Reason: Lacks detail on benefits/tradeoffs of separate pools versus backups in TrueNAS.
+[2026-01-16 21:55:54,576] [INFO] QID: 1, Verdict: Good (4), Reason: Provides minimal justification; omits nuances of separate pools and failure domains.
+[2026-01-16 21:55:57,811] [INFO] QID: 1, Verdict: Fair (3), Reason: Oversimplifies “two media” and ignores TrueNAS-specific benefits of separate pools.
+[2026-01-16 21:55:58,205] [INFO] QID: 1, Semantic Diversity: 0.3261328935623169
+[2026-01-16 21:55:58,722] [INFO] QID: 2, Semantic Diversity: 0.5811480581760406
+[2026-01-16 21:55:59,213] [INFO] QID: 4, Semantic Diversity: 0.35296881198883057
+[2026-01-16 21:55:59,746] [INFO] QID: 5, Semantic Diversity: 0.4420355558395386
+[2026-01-16 21:56:00,260] [INFO] QID: 6, Semantic Diversity: 0.5342596769332886
+[2026-01-16 21:56:01,246] [INFO] QID: 7, Semantic Diversity: 0.4252732992172241
+[2026-01-16 21:56:01,693] [INFO] QID: 8, Semantic Diversity: 0.30023854970932007
+[2026-01-16 21:56:01,987] [INFO] QID: 9, Semantic Diversity: 0.367077112197876
+[2026-01-16 21:56:02,399] [INFO] QID: 10, Semantic Diversity: 0.5202166140079498
+[2026-01-16 21:56:02,882] [INFO] QID: 11, Semantic Diversity: 0.5219545662403107
+[2026-01-16 21:56:03,638] [INFO] QID: 12, Semantic Diversity: 0.4264450669288635
+[2026-01-16 21:56:03,861] [INFO] QID: 13, Semantic Diversity: 0.5374159216880798
+[2026-01-16 21:56:04,229] [INFO] QID: 14, Semantic Diversity: 0.4161871671676636
+[2026-01-16 21:56:05,374] [INFO] QID: 15, Semantic Diversity: 0.48290443420410156
+[2026-01-16 21:56:05,807] [INFO] QID: 16, Semantic Diversity: 0.5043179392814636
+[2026-01-16 21:56:06,108] [INFO] QID: 17, Semantic Diversity: 0.39549410343170166
+[2026-01-16 21:56:06,657] [INFO] QID: 18, Semantic Diversity: 0.19146102666854858
+[2026-01-16 21:56:07,070] [INFO] QID: 19, Semantic Diversity: 0.5026247799396515
+[2026-01-16 21:56:07,538] [INFO] QID: 20, Semantic Diversity: 0.2513357400894165
+[2026-01-16 21:56:08,251] [INFO] QID: 22, Semantic Diversity: 0.4466422200202942
+[2026-01-16 21:56:08,636] [INFO] QID: 23, Semantic Diversity: 0.36532628536224365
+[2026-01-16 21:56:08,912] [INFO] QID: 24, Semantic Diversity: 0.5132521688938141
+[2026-01-16 21:56:09,251] [INFO] QID: 25, Semantic Diversity: 0.36943620443344116
+[2026-01-16 21:56:09,708] [INFO] QID: 26, Semantic Diversity: 0.22669917345046997
+[2026-01-16 21:56:10,151] [INFO] QID: 27, Semantic Diversity: 0.4103323817253113
+[2026-01-16 21:56:10,495] [INFO] QID: 28, Semantic Diversity: 0.4061393141746521
+[2026-01-16 21:56:10,865] [INFO] QID: 29, Semantic Diversity: 0.37214475870132446
+[2026-01-16 21:56:11,488] [INFO] QID: 30, Semantic Diversity: 0.42128467559814453
+[2026-01-16 21:56:11,941] [INFO] QID: 31, Semantic Diversity: 0.5527072846889496
+[2026-01-16 21:56:12,432] [INFO] QID: 32, Semantic Diversity: 0.40505003929138184
+[2026-01-16 21:56:12,921] [INFO] QID: 33, Semantic Diversity: 0.4121711850166321
+[2026-01-16 21:56:13,681] [INFO] QID: 34, Semantic Diversity: 0.6520897448062897
+[2026-01-16 21:56:14,124] [INFO] QID: 35, Semantic Diversity: 0.45746153593063354
+[2026-01-16 21:56:14,625] [INFO] QID: 36, Semantic Diversity: 0.3876250982284546
+[2026-01-16 21:56:15,246] [INFO] QID: 37, Semantic Diversity: 0.43642520904541016
+[2026-01-16 21:56:15,603] [INFO] QID: 38, Semantic Diversity: 0.4732641577720642
+[2026-01-16 21:56:16,245] [INFO] QID: 39, Semantic Diversity: 0.4379394054412842
+[2026-01-16 21:56:16,936] [INFO] QID: 40, Semantic Diversity: 0.4538952112197876
+[2026-01-16 21:56:17,198] [INFO] QID: 41, Semantic Diversity: 0.3837696313858032
+[2026-01-16 21:56:17,770] [INFO] QID: 42, Semantic Diversity: 0.33557337522506714
+[2026-01-16 21:56:18,219] [INFO] QID: 43, Semantic Diversity: 0.3672395348548889
+[2026-01-16 21:56:18,707] [INFO] QID: 44, Semantic Diversity: 0.40974920988082886
+[2026-01-16 21:56:19,265] [INFO] QID: 45, Semantic Diversity: 0.2818896770477295
+[2026-01-16 21:56:19,648] [INFO] QID: 46, Semantic Diversity: 0.43204379081726074
+[2026-01-16 21:56:20,572] [INFO] QID: 47, Semantic Diversity: 0.4342288374900818
+[2026-01-16 21:56:21,506] [INFO] QID: 48, Semantic Diversity: 0.4318104386329651
+[2026-01-16 21:56:22,053] [INFO] QID: 49, Semantic Diversity: 0.3688563108444214
+[2026-01-16 21:56:22,510] [INFO] QID: 50, Semantic Diversity: 0.46566712856292725
+[2026-01-16 21:56:22,892] [INFO] QID: 51, Semantic Diversity: 0.3825090527534485
+[2026-01-16 21:56:23,128] [INFO] QID: 52, Semantic Diversity: 0.5541887581348419
+[2026-01-16 21:56:23,792] [INFO] QID: 53, Semantic Diversity: 0.37949275970458984
+[2026-01-16 21:56:24,253] [INFO] QID: 54, Semantic Diversity: 0.44750070571899414
+[2026-01-16 21:56:25,326] [INFO] QID: 55, Semantic Diversity: 0.3656626343727112
+[2026-01-16 21:56:25,936] [INFO] QID: 56, Semantic Diversity: 0.31574904918670654
+[2026-01-16 21:56:26,453] [INFO] QID: 57, Semantic Diversity: 0.5372352302074432
+[2026-01-16 21:56:26,713] [INFO] QID: 58, Semantic Diversity: 0.3951101303100586
+[2026-01-16 21:56:27,674] [INFO] QID: 59, Semantic Diversity: 0.2948192358016968
+[2026-01-16 21:56:28,999] [INFO] QID: 60, Semantic Diversity: 0.43884795904159546
+[2026-01-16 21:56:29,353] [INFO] QID: 61, Semantic Diversity: 0.4484368562698364
+[2026-01-16 21:56:29,993] [INFO] QID: 62, Semantic Diversity: 0.37298017740249634
+[2026-01-16 21:56:30,355] [INFO] QID: 63, Semantic Diversity: 0.4074721932411194
+[2026-01-16 21:56:30,890] [INFO] QID: 64, Semantic Diversity: 0.334206759929657
+[2026-01-16 21:56:31,152] [INFO] QID: 65, Semantic Diversity: 0.45635128021240234
+[2026-01-16 21:56:31,656] [INFO] QID: 66, Semantic Diversity: 0.3985176682472229
+[2026-01-16 21:56:32,619] [INFO] QID: 67, Semantic Diversity: 0.2545417547225952
+[2026-01-16 21:56:32,982] [INFO] QID: 68, Semantic Diversity: 0.5061915814876556
+[2026-01-16 21:56:33,382] [INFO] QID: 69, Semantic Diversity: 0.3781901001930237
+[2026-01-16 21:56:33,919] [INFO] QID: 70, Semantic Diversity: 0.4513246417045593
+[2026-01-16 21:56:34,345] [INFO] QID: 71, Semantic Diversity: 0.20436257123947144
+[2026-01-16 21:56:34,863] [INFO] QID: 72, Semantic Diversity: 0.09490382671356201
+[2026-01-16 21:56:35,354] [INFO] QID: 73, Semantic Diversity: 0.5363436043262482
+[2026-01-16 21:56:35,875] [INFO] QID: 74, Semantic Diversity: 0.29248470067977905
+[2026-01-16 21:56:36,322] [INFO] QID: 75, Semantic Diversity: 0.5128020942211151
+[2026-01-16 21:56:36,854] [INFO] QID: 76, Semantic Diversity: 0.5241618752479553
+[2026-01-16 21:56:37,842] [INFO] QID: 77, Semantic Diversity: 0.4044795632362366
+[2026-01-16 21:56:38,855] [INFO] QID: 78, Semantic Diversity: 0.4186393618583679
+[2026-01-16 21:56:39,232] [INFO] QID: 79, Semantic Diversity: 0.6104044616222382
+[2026-01-16 21:56:39,557] [INFO] QID: 80, Semantic Diversity: 0.4584490656852722
+[2026-01-16 21:56:39,987] [INFO] QID: 81, Semantic Diversity: 0.032563865184783936
+[2026-01-16 21:56:40,381] [INFO] QID: 82, Semantic Diversity: 0.24195456504821777
+[2026-01-16 21:56:40,652] [INFO] QID: 83, Semantic Diversity: 0.41205036640167236
+[2026-01-16 21:56:41,194] [INFO] QID: 84, Semantic Diversity: 0.41458332538604736
+[2026-01-16 21:56:41,886] [INFO] QID: 85, Semantic Diversity: 0.4784955382347107
+[2026-01-16 21:56:42,211] [INFO] QID: 86, Semantic Diversity: 0.494570791721344
+[2026-01-16 21:56:42,752] [INFO] QID: 87, Semantic Diversity: 0.4706556797027588
+[2026-01-16 21:56:43,289] [INFO] QID: 88, Semantic Diversity: 0.6008023023605347
+[2026-01-16 21:56:43,790] [INFO] QID: 89, Semantic Diversity: 0.5805146396160126
+[2026-01-16 21:56:44,251] [INFO] QID: 90, Semantic Diversity: 0.5190469920635223
+[2026-01-16 21:56:44,608] [INFO] QID: 91, Semantic Diversity: 0.5668404996395111
+[2026-01-16 21:56:45,077] [INFO] QID: 92, Semantic Diversity: 0.5180989503860474
+[2026-01-16 21:56:45,591] [INFO] QID: 93, Semantic Diversity: 0.11193221807479858
+[2026-01-16 21:56:46,062] [INFO] QID: 94, Semantic Diversity: 0.3854280710220337
+[2026-01-16 21:56:46,434] [INFO] QID: 95, Semantic Diversity: 0.45080018043518066
+[2026-01-16 21:56:46,771] [INFO] QID: 96, Semantic Diversity: 0.5707522630691528
+[2026-01-16 21:56:47,268] [INFO] QID: 97, Semantic Diversity: 0.24945515394210815
+[2026-01-16 21:56:47,612] [INFO] QID: 98, Semantic Diversity: 0.4113907217979431
+[2026-01-16 21:56:48,180] [INFO] QID: 99, Semantic Diversity: 0.5874521434307098
+[2026-01-16 21:56:48,438] [INFO] QID: 100, Semantic Diversity: 0.36711835861206055
+[2026-01-16 22:00:45,977] [INFO] Parsed 98 QIDs from ./results/baselines/gpt-5-mini_vsampling.txt
+[2026-01-16 22:00:45,977] [INFO] Input File: gpt-5-mini_vsampling.txt, Prepared 1 queries for evaluation.
+[2026-01-16 22:00:51,411] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 22:00:51,756] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 22:00:51,852] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 22:00:51,920] [INFO] QID: 1, Extracted 1 claims from answer.
+[2026-01-16 22:00:52,340] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 22:00:53,109] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 22:00:53,480] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 22:00:53,590] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 22:00:54,585] [INFO] QID: 1, Extracted 1 claims from answer.
+[2026-01-16 22:00:57,708] [INFO] QID: 1, Extracted 1 claims from answer.
+[2026-01-16 22:00:58,682] [INFO] QID: 1, Start with 17 claims. Found 11 unique claims.
+[2026-01-16 22:01:04,141] [INFO] QID: 1, Verdict: Excellent (5), Reason: NONE
+[2026-01-16 22:01:06,060] [INFO] QID: 1, Verdict: Excellent (5), Reason: NONE
+[2026-01-16 22:01:07,491] [INFO] QID: 1, Verdict: Excellent (5), Reason: NONE
+[2026-01-16 22:01:09,285] [INFO] QID: 1, Verdict: Good (4), Reason: Light on justification; conflates redundancy with backups and lacks nuanced tradeoffs.
+[2026-01-16 22:01:09,913] [INFO] QID: 1, Verdict: Good (4), Reason: Doesn't mention legitimate benefits of separate pools beyond security, like redundancy or isolation.
+[2026-01-16 22:01:10,537] [INFO] QID: 1, Verdict: Good (4), Reason: Doesn't address potential benefits/limits of separate pools versus backups in same chassis.
+[2026-01-16 22:01:12,258] [INFO] QID: 1, Verdict: Good (4), Reason: Limited explanation of separate pool benefits and specific risk trade-offs.
+[2026-01-16 22:01:13,365] [INFO] QID: 1, Verdict: Good (4), Reason: Brief; omits nuances of separate pools on same hardware and failure domains.
+[2026-01-16 22:01:13,853] [INFO] QID: 1, Verdict: Good (4), Reason: Too brief; lacks detailed trade-offs and TrueNAS/ZFS-specific justification.
+[2026-01-16 22:01:14,170] [INFO] QID: 1, Verdict: Good (4), Reason: Mentions immutable snapshots ambiguously; limited detail on when separate pool truly helps.
+[2026-01-16 22:01:14,172] [INFO] QID: 1, Lexical Diversity: 0.819
+[2026-01-16 22:01:14,984] [INFO] QID: 1, Semantic Diversity: 0.3261263966560364
+[2026-01-16 22:12:18,609] [INFO] Parsed 100 QIDs from ./results/baselines/gpt-5-mini.txt
+[2026-01-16 22:12:18,623] [INFO] Input File: gpt-5-mini.txt, Prepared 100 queries for evaluation.
+[2026-01-16 22:12:27,147] [INFO] QID: 1, Extracted 3 claims from answer.
+[2026-01-16 22:12:29,143] [INFO] QID: 1, Extracted 3 claims from answer.
+[2026-01-16 22:12:29,889] [INFO] QID: 1, Extracted 4 claims from answer.
+[2026-01-16 22:12:30,315] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 22:12:30,765] [INFO] QID: 1, Extracted 2 claims from answer.
+[2026-01-16 22:12:30,841] [INFO] QID: 1, Extracted 3 claims from answer.
+[2026-01-16 22:12:31,395] [INFO] QID: 2, Extracted 8 claims from answer.
+[2026-01-16 22:12:31,714] [INFO] QID: 3, Extracted 2 claims from answer.
+[2026-01-16 22:12:31,727] [INFO] QID: 1, Extracted 3 claims from answer.
+[2026-01-16 22:12:31,829] [INFO] QID: 1, Extracted 3 claims from answer.
+[2026-01-16 22:12:32,163] [INFO] QID: 1, Extracted 3 claims from answer.
+[2026-01-16 22:12:35,257] [INFO] QID: 3, Extracted 1 claims from answer.
+[2026-01-16 22:12:36,642] [INFO] QID: 2, Extracted 8 claims from answer.
+[2026-01-16 22:12:36,678] [INFO] QID: 1, Extracted 3 claims from answer.
+[2026-01-16 22:12:37,280] [INFO] QID: 3, Extracted 3 claims from answer.
+[2026-01-16 22:12:37,286] [INFO] QID: 2, Extracted 6 claims from answer.
+[2026-01-16 22:12:38,466] [INFO] QID: 3, Extracted 6 claims from answer.
+[2026-01-16 22:12:39,444] [INFO] QID: 3, Extracted 4 claims from answer.
+[2026-01-16 22:12:39,612] [INFO] QID: 4, Extracted 6 claims from answer.
+[2026-01-16 22:12:39,696] [INFO] QID: 2, Extracted 9 claims from answer.
+[2026-01-16 22:12:40,108] [INFO] QID: 2, Extracted 9 claims from answer.
+[2026-01-16 22:12:40,282] [INFO] QID: 2, Extracted 7 claims from answer.
+[2026-01-16 22:12:40,525] [INFO] QID: 3, Extracted 6 claims from answer.
+[2026-01-16 22:12:40,665] [INFO] QID: 3, Extracted 4 claims from answer.
+[2026-01-16 22:12:41,022] [INFO] QID: 2, Extracted 6 claims from answer.
+[2026-01-16 22:12:41,393] [INFO] QID: 2, Extracted 8 claims from answer.
+[2026-01-16 22:12:41,438] [INFO] QID: 3, Extracted 5 claims from answer.
+[2026-01-16 22:12:41,626] [INFO] QID: 2, Extracted 13 claims from answer.
+[2026-01-16 22:12:41,855] [INFO] QID: 3, Extracted 5 claims from answer.
+[2026-01-16 22:12:42,256] [INFO] QID: 2, Extracted 10 claims from answer.
+[2026-01-16 22:12:43,992] [INFO] QID: 4, Extracted 2 claims from answer.
+[2026-01-16 22:12:44,241] [INFO] QID: 3, Extracted 4 claims from answer.
+[2026-01-16 22:12:46,723] [INFO] QID: 4, Extracted 3 claims from answer.
+[2026-01-16 22:12:46,969] [INFO] QID: 4, Extracted 3 claims from answer.
+[2026-01-16 22:12:49,745] [INFO] QID: 4, Extracted 3 claims from answer.
+[2026-01-16 22:12:51,453] [INFO] QID: 4, Extracted 5 claims from answer.
+[2026-01-16 22:12:51,565] [INFO] QID: 5, Extracted 5 claims from answer.
+[2026-01-16 22:12:51,907] [INFO] QID: 4, Extracted 3 claims from answer.
+[2026-01-16 22:12:52,725] [INFO] QID: 5, Extracted 4 claims from answer.
+[2026-01-16 22:12:53,101] [INFO] QID: 6, Extracted 11 claims from answer.

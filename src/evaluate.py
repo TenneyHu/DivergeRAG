@@ -1,7 +1,6 @@
 import argparse
 import torch
 import numpy as np
-from sklearn.metrics.pairwise import cosine_similarity
 from openai import OpenAI
 from tqdm import tqdm
 from datasets import load_from_disk
@@ -10,14 +9,19 @@ from prompt import *
 import json
 import asyncio
 from openai import AsyncOpenAI
+from logger import setup_debug_logger
 
+logger = setup_debug_logger(
+            log_dir="./logs",
+            log_name="evaluate.log",
+)
 def lexical_diversity(text_dict, max_n=3):
     def get_ngrams(tokens, n):
         return [tuple(tokens[i:i+n]) for i in range(len(tokens) - n + 1)]
 
     per_input_avg_ratios = []
 
-    for _, texts in text_dict.items():
+    for qid, texts in text_dict.items():
         uniq_ratios = []
 
         for n in range(1, max_n + 1):
@@ -29,16 +33,16 @@ def lexical_diversity(text_dict, max_n=3):
             unique = len(set(all_ngrams))
             ratio = unique / total if total > 0 else 0
             uniq_ratios.append(ratio)
-
+        logger.info(f"QID: {qid}, Lexical Diversity: {sum(uniq_ratios) / len(uniq_ratios) if uniq_ratios else 0:.3f}")
         avg_ratio = sum(uniq_ratios) / len(uniq_ratios) if uniq_ratios else 0
         per_input_avg_ratios.append(avg_ratio)
-    print("Lexical diversity:", sum(per_input_avg_ratios) / len(per_input_avg_ratios) if per_input_avg_ratios else 0.0)
+
     return sum(per_input_avg_ratios) / len(per_input_avg_ratios) if per_input_avg_ratios else 0.0
 
 def semantic_diversity_openai(qid_to_texts):
     diversities = []
     client = OpenAI()
-    for texts in qid_to_texts.values():
+    for qid, texts in qid_to_texts.items():
         if len(texts) < 2:
             continue
         
@@ -59,7 +63,7 @@ def semantic_diversity_openai(qid_to_texts):
         upper_triangular = similarity_matrix[idx[0], idx[1]]
         diversity = 1 - upper_triangular.mean().item()
         diversities.append(diversity)
-    print ("Semantic diversity:", np.mean(diversities) if diversities else 0.0)
+        logger.info(f"QID: {qid}, Semantic Diversity: {diversity}")
     return float(np.mean(diversities)) if diversities else 0.0
 
 VERDICT_TO_ID = {
@@ -97,7 +101,7 @@ async def quality_score_async(args, queries, max_concurrency=20):
 
             try:
                 resp = await client.chat.completions.create(
-                    model=args.model,
+                    model=args.quality_model,
                     messages=[{"role": "user", "content": prompt}],
                 )
                 raw = resp.choices[0].message.content.strip()
@@ -111,8 +115,7 @@ async def quality_score_async(args, queries, max_concurrency=20):
                 reason = "Failed to parse JSON output"
 
             verdict_id = VERDICT_TO_ID.get(verdict, 0)
-            print(f"QID: {qid}, Verdict: {verdict} ({verdict_id}), Reason: {reason}")
-
+            logger.info(f"QID: {qid}, Verdict: {verdict} ({verdict_id}), Reason: {reason}")
             return verdict_id
 
     tasks = []
@@ -123,163 +126,201 @@ async def quality_score_async(args, queries, max_concurrency=20):
     verdict_ids = await asyncio.gather(*tasks)
 
     final_score = float(np.mean(verdict_ids)) if verdict_ids else 0.0
-    print("Average quality score:", final_score)
 
     return final_score
 
-def parse_results_file(filepath):
-    queries = {}
-
-    with open(filepath, "r", encoding="utf-8") as f:
-        for line in f:
-            line = line.strip()
-            if not line:
-                continue
-
-            # Qid 0\tNum1\tXXX
-            parts = line.split("\t")
-            if len(parts) < 3:
-                continue
-
-            # 解析 qid
-            qid = int(parts[0].split()[1])
-
-            answer = parts[2].strip()
-            if answer == "Empty Response":
-                print("Empty Response found, skipping.")
-                continue
-            if qid not in queries:
-                queries[qid] = []
-
-            queries[qid].append(answer)
-
-    return queries
-
 def parse_file(filepath):
     qid_to_texts = {}
-
     with open(filepath, 'r', encoding='utf-8') as f:
         for line in f:
             line = line.strip()
             if not line:
                 continue
-
-            # Format: num|qid: answer
             try:
                 _, rest = line.split('|', 1)
                 qid_part, answer = rest.split(':', 1)
                 qid = int(qid_part)
             except ValueError:
                 continue
-
             answer = answer.strip()
             if answer == "Empty Response":
-                print("Empty Response found, skipping.")
+                logger.warning(f"QID: {qid} has empty response, skipping.")
                 continue
             if qid not in qid_to_texts:
                 qid_to_texts[qid] = []
-
             qid_to_texts[qid].append(answer)
-
+    logger.info(f"Parsed {len(qid_to_texts)} QIDs from {filepath}")
     return qid_to_texts
 
-def cosine_sim(a, b):
-    a = np.array(a)
-    b = np.array(b)
-    return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
-
-async def query_relevance_async(
+async def extract_claims_async(
     args,
     queries,
     max_concurrency=20,
 ):
+    """
+    For each query:
+      - extract claims from each answer
+      - merge all claims under the same query
+    """
 
     client = AsyncOpenAI()
     semaphore = asyncio.Semaphore(max_concurrency)
 
-    async def generate_and_score(qid, original_query, text):
+    async def extract_from_answer(qid, original_query, answer_text):
         async with semaphore:
+            claims = []
 
-            prompt = args.query_generation_prompt.format(ANSWER=text)
+            prompt = args.claim_extraction_prompt.format(
+                QUESTION=original_query,
+                ANSWER=answer_text,
+            )
 
             try:
                 resp = await client.chat.completions.create(
-                    model=args.model,
+                    model=args.viewpoint_model,
                     messages=[{"role": "user", "content": prompt}],
                 )
                 raw = resp.choices[0].message.content.strip()
+
                 parsed = json.loads(raw)
-                new_query = parsed["question"]
+                extracted = parsed.get("claims", [])
 
-
-                emb_resp = await client.embeddings.create(
-                    model=args.embed_model,
-                    input=[original_query, new_query],
-                )
-
-                orig_emb = emb_resp.data[0].embedding
-                new_emb = emb_resp.data[1].embedding
-
-                sim = cosine_sim(orig_emb, new_emb)
+                if isinstance(extracted, list):
+                    claims = [c.strip() for c in extracted if isinstance(c, str)]
 
             except Exception as e:
-                new_query = ""
-                sim = 0.0
+                # failure → empty claim list
+                claims = []
+                logger.error(f"QID: {qid}, Claim extraction failed: {e}")
+            logger.info(f"QID: {qid}, Extracted {len(claims)} claims from answer.")
+            return qid, claims
 
-            print(
-                f"QID {qid} | sim={sim:.3f} | original: {original_query} | generated: {new_query}"
-            )
-
-            return {
-                "qid": qid,
-                "original_query": original_query,
-                "generated_query": new_query,
-                "similarity": sim,
-            }
-
+    # ---- build tasks ----
     tasks = []
-
     for qid, (orig_query, texts) in queries.items():
         for text in texts:
             tasks.append(
-                generate_and_score(qid, orig_query, text)
+                extract_from_answer(qid, orig_query, text)
             )
 
-
+    # ---- run async ----
     results = await asyncio.gather(*tasks)
 
-    return np.mean([res["similarity"] for res in results])
+    # ---- merge claims per query ----
+    merged_claims = {}
+    for qid, claims in results:
+        if qid not in merged_claims:
+            merged_claims[qid] = []
+        merged_claims[qid].extend(claims)
+
+    return merged_claims
+
+def average_unique_claims_per_qid_embedding(
+    qid_to_texts,
+    threshold=0.75,
+):
+    client = OpenAI()
+    counts = []
+
+    for qid, texts in qid_to_texts.items():
+        if not texts:
+            continue
+
+        embeddings = get_embeddings(client, texts)
+        count = count_unique_claims_pairwise_with_embeddings(
+            texts, embeddings, threshold
+        )
+        logger.info(f"QID: {qid}, Start with {len(texts)} claims. Found {count} unique claims.")
+        ratio = count / len(texts)
+        counts.append(ratio)
+
+    return sum(counts) / len(counts) if counts else 0.0
+
+def count_unique_claims_pairwise_with_embeddings(
+    texts,
+    embeddings,
+    threshold=0.75,
+):
+    """
+    texts: List[str]
+    embeddings: np.ndarray, shape (n, d)
+    """
+    unique_indices = []
+
+    for i in range(len(texts)):
+        is_dup = False
+        for j in unique_indices:
+            sim = np.dot(embeddings[i], embeddings[j]) / (
+                np.linalg.norm(embeddings[i]) * np.linalg.norm(embeddings[j])
+            )
+            if sim >= threshold:
+                is_dup = True
+                break
+        if not is_dup:
+            unique_indices.append(i)
+
+    return len(unique_indices)
+
+def cosine_sim(u, v):
+    u = np.array(u)
+    v = np.array(v)
+    return np.dot(u, v) / (np.linalg.norm(u) * np.linalg.norm(v))
+
+def get_embeddings(client, texts):
+    resp = client.embeddings.create(
+        model="text-embedding-3-small",
+        input=texts,
+    )
+    return np.array([d.embedding for d in resp.data])
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("--device", type=str, default="cuda" if torch.cuda.is_available() else "cpu")
-    parser.add_argument("--model", type=str, default="gpt-5", help="LLM model name")
+    parser.add_argument("--quality_model", type=str, default="gpt-5", help="LLM model name")
+    parser.add_argument("--viewpoint_model", type=str, default="gpt-5-mini", help="LLM model name")
     parser.add_argument("--quality_prompt", type=str, default=quality_prompt, help="Quality evaluation prompt template")
+    parser.add_argument("--claim_extraction_prompt", type=str, default=claim_extraction_prompt, help="Claim extraction prompt template")
     parser.add_argument("--query_generation_prompt", type=str, default=question_generation_prompt, help="Query generation prompt template")
     parser.add_argument("--embed_model", type=str, default="text-embedding-3-small", help="Embedding model name")
+    parser.add_argument("--max_qid", type=int, default=100, help="Maximum QID to process")
+    parser.add_argument("--input_file", type=str, default="./results/baselines/gpt-5-mini_vsampling.txt", help="Input file with generated answers")
+    parser.add_argument("--output_dir", type=str, default="./results/eval/", help="Output directory for evaluation results")
     args = parser.parse_args()
 
     dataset = load_from_disk("~/CLAN/DivergeRAG/data/clan_diverge_dataset")["train"]
     raw_prompts = dataset["prompt"]                    
 
 
-    qid_to_texts = parse_file("./results/baselines/gpt-5-mini_vsampling.txt")
-    #qid_to_texts = parse_file("./results/diverge_results.txt")
+    qid_to_texts = parse_file(args.input_file)
+    
     queries = {
         qid: (raw_prompts[qid - 1], texts)
         for qid, texts in qid_to_texts.items()
-        if 1 <= qid <= 21
+        if 1 <= qid <= args.max_qid
     }
- 
-
-
-
     
-    final_score = asyncio.run(
+    qid_to_texts = {qid: texts for qid, texts in qid_to_texts.items() if 1 <= qid <= args.max_qid}
+
+    input_name = args.input_file.split('/')[-1]
+
+    logger.info(f"Input File: {input_name}, Prepared {len(queries)} queries for evaluation.")
+
+    res = asyncio.run(
+        extract_claims_async(args, queries, max_concurrency=20)
+    )
+    view_div = average_unique_claims_per_qid_embedding(res)
+    
+    final_quality_score = asyncio.run(
         quality_score_async(args, queries, max_concurrency=20)
     )
-    print("Final quality score:", final_score / 5.0)
-    
     
     lex_div = lexical_diversity(qid_to_texts, max_n=3)
     semantic_div = semantic_diversity_openai(qid_to_texts)
+
+
+    with open(args.output_dir + input_name + ".txt", 'w', encoding='utf-8') as f:
+        f.write(f"Input File: {input_name}\t")
+        f.write(f"Lexical Diversity: {lex_div:.3f}\t")
+        f.write(f"Semantic Diversity: {semantic_div:.3f}\t")
+        f.write(f"View Diversity: {view_div:.3f}\t")
+        f.write(f"Quality score: {final_quality_score:.3f}\n")

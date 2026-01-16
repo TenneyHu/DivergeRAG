@@ -1,0 +1,1 @@
+Input File: gpt-5-mini_vsampling.txt	Lexical Diversity: 0.819	Semantic Diversity: 0.326	View Diversity: 0.647	Quality score: 4.300

@@ -55,7 +55,7 @@ async def run_all_queries_async(dataset, nums_answers, outfile, max_workers=4):
 dataset = DatasetDict.load_from_disk("./data/clan_diverge_dataset")["train"]
 dataset = dataset.select(range(100))
 nums_answers = 10
-MAX_WORKERS = 30
+MAX_WORKERS = 25
 
 with open("./results/diverge_results1.txt", "w", encoding="utf-8") as f:
     asyncio.run(

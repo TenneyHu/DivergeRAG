@@ -37,6 +37,31 @@ Do NOT include explanations, comments, or markdown.
   }}
 ]
 """
+expansion_prompt_template = """
+You are a query expansion assistant for information retrieval.
+
+Your task is to rewrite the original query into multiple distinct queries
+that can be used to retrieve complementary and diverse information.
+
+The original query:
+{QUERY}
+
+Output MUST be valid JSON in the following format:
+
+{{
+  "queries": [
+    "<Expanded query 1>",
+    "<Expanded query 2>",
+    "...",
+    "<Expanded query K>"
+  ]
+}}
+
+Rules:
+- You MUST produce EXACTLY {k} queries — no more, no fewer.
+- Do NOT include numbering, bullet points, or labels inside the queries.
+- Do NOT output anything outside the JSON object.
+"""
 
 reflection_prompt = """
 You are given an open-ended question and a list of views that have already been identified.
@@ -302,4 +327,48 @@ Rules:
 - Do NOT include quotation marks (") inside the text fields.
 - Do NOT include numbering, bullet points, or labels inside the text.
 - Do NOT output anything outside the JSON object.
+"""
+
+claim_extraction_prompt = """
+You are an information extraction assistant.
+
+Your task is to decompose an answer into a small set of high-level claims.
+Each claim must represent a complete, self-contained answer to the original question.
+
+Question:
+{QUESTION}
+
+Answer:
+{ANSWER}
+
+Definition of a claim:
+- A claim must be able to stand alone as a reasonable answer to the question.
+- Each claim should express a complete position, recommendation, or conclusion.
+- A claim may summarize multiple supporting reasons, but should not list them separately.
+- Claims should be distinct alternative answers, not sub-points or justifications.
+
+Guidelines:
+- Extract only claims that directly answer the question.
+- Do NOT extract supporting arguments, evidence, examples, or implementation details as separate claims.
+- Do NOT split a single answer into multiple claims if they jointly express one position.
+- If multiple sentences together express one answer, merge them into one claim.
+- Prefer fewer, higher-level claims over many fine-grained ones.
+
+Output MUST be valid JSON in the following format:
+
+{{
+  "claims": [
+    "<Complete answer-level claim 1>",
+    "<Complete answer-level claim 2>",
+    "...",
+    "<Complete answer-level claim N>"
+  ]
+}}
+
+Rules:
+- Each claim must be a single complete sentence.
+- Each claim must independently answer the question.
+- Each claim should be very concise.
+- Do NOT include numbering, labels, or text outside the JSON object.
+
 """
