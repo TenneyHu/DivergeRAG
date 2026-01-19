@@ -27,6 +27,14 @@ def cosine_sim(a, b):
     b = np.array(b)
     return float(np.dot(a, b) / (np.linalg.norm(a) * np.linalg.norm(b)))
 
+def index_check(index, query):
+    retriever = index.as_retriever(similarity_top_k=5)
+    base_nodes = retriever.retrieve(query)
+    if len(base_nodes) > 0:
+        return True
+    else:
+        return False
+    
 def setup_llm(provider: str, model: str):
     if provider == "openai":
         Settings.llm = OpenAIClient(model=model)
@@ -273,7 +281,9 @@ class DivRAG:
             storage_context = StorageContext.from_defaults(
                 persist_dir=qdir
             )
-            return load_index_from_storage(storage_context)
+            index = load_index_from_storage(storage_context)
+            if index_check(index, query):
+                return index
 
         search_results = google_search(
             query,

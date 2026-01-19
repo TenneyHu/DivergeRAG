@@ -36,7 +36,7 @@ def lexical_diversity(text_dict, max_n=3):
         logger.info(f"QID: {qid}, Lexical Diversity: {sum(uniq_ratios) / len(uniq_ratios) if uniq_ratios else 0:.3f}")
         avg_ratio = sum(uniq_ratios) / len(uniq_ratios) if uniq_ratios else 0
         per_input_avg_ratios.append(avg_ratio)
-
+    logger.info(f"Average Lexical Diversity: {sum(per_input_avg_ratios) / len(per_input_avg_ratios) if per_input_avg_ratios else 0.0:.3f}")
     return sum(per_input_avg_ratios) / len(per_input_avg_ratios) if per_input_avg_ratios else 0.0
 
 def semantic_diversity_openai(qid_to_texts):
@@ -64,6 +64,7 @@ def semantic_diversity_openai(qid_to_texts):
         diversity = 1 - upper_triangular.mean().item()
         diversities.append(diversity)
         logger.info(f"QID: {qid}, Semantic Diversity: {diversity}")
+    logger.info(f"Average Semantic Diversity: {float(np.mean(diversities)) if diversities else 0.0:.3f}")
     return float(np.mean(diversities)) if diversities else 0.0
 
 VERDICT_TO_ID = {
@@ -92,7 +93,7 @@ async def quality_score_async(args, queries, max_concurrency=20):
     client = AsyncOpenAI()
     semaphore = asyncio.Semaphore(max_concurrency)
 
-    async def eval_one(qid, question, answer):
+    async def eval_one(qid, textid, question, answer):
         async with semaphore:
             prompt = args.quality_prompt.format(
                 QUESTION=question,
@@ -115,21 +116,24 @@ async def quality_score_async(args, queries, max_concurrency=20):
                 reason = "Failed to parse JSON output"
 
             verdict_id = VERDICT_TO_ID.get(verdict, 0)
-            logger.info(f"QID: {qid}, Verdict: {verdict} ({verdict_id}), Reason: {reason}")
+            logger.info(f"QID: {qid}, TextID: {textid}, Verdict: {verdict} ({verdict_id}), Reason: {reason}")
             return verdict_id
 
     tasks = []
+
     for qid, (question, answers) in queries.items():
-        for ans in answers:
-            tasks.append(eval_one(qid, question, ans))
+        for textid, ans in enumerate(answers):
+            tasks.append(
+                eval_one(qid, textid, question, ans)
+            )
 
     verdict_ids = await asyncio.gather(*tasks)
 
     final_score = float(np.mean(verdict_ids)) if verdict_ids else 0.0
-
+    logger.info(f"Final Quality Score: {final_score:.3f}")
     return final_score
 
-def parse_file(filepath):
+def parse_file(filepath, fixed_qid=None):
     qid_to_texts = {}
     with open(filepath, 'r', encoding='utf-8') as f:
         for line in f:
@@ -140,6 +144,8 @@ def parse_file(filepath):
                 _, rest = line.split('|', 1)
                 qid_part, answer = rest.split(':', 1)
                 qid = int(qid_part)
+                if fixed_qid is not None:
+                    qid = fixed_qid
             except ValueError:
                 continue
             answer = answer.strip()
@@ -233,7 +239,7 @@ def average_unique_claims_per_qid_embedding(
         logger.info(f"QID: {qid}, Start with {len(texts)} claims. Found {count} unique claims.")
         ratio = count / len(texts)
         counts.append(ratio)
-
+    logger.info(f"Average unique claims per QID (ratio): {sum(counts) / len(counts) if counts else 0.0:.3f}")
     return sum(counts) / len(counts) if counts else 0.0
 
 def count_unique_claims_pairwise_with_embeddings(
@@ -283,15 +289,17 @@ if __name__ == "__main__":
     parser.add_argument("--query_generation_prompt", type=str, default=question_generation_prompt, help="Query generation prompt template")
     parser.add_argument("--embed_model", type=str, default="text-embedding-3-small", help="Embedding model name")
     parser.add_argument("--max_qid", type=int, default=100, help="Maximum QID to process")
-    parser.add_argument("--input_file", type=str, default="./results/baselines/gpt-5-mini_vsampling.txt", help="Input file with generated answers")
+    parser.add_argument("--input_file", type=str, default="./results/demo_output.txt", help="Input file with generated answers")
     parser.add_argument("--output_dir", type=str, default="./results/eval/", help="Output directory for evaluation results")
+    parser.add_argument("--fixed_qid", type=int, default=None, help="Force QID For debugging")
     args = parser.parse_args()
 
     dataset = load_from_disk("~/CLAN/DivergeRAG/data/clan_diverge_dataset")["train"]
     raw_prompts = dataset["prompt"]                    
 
 
-    qid_to_texts = parse_file(args.input_file)
+
+    qid_to_texts = parse_file(args.input_file, fixed_qid=args.fixed_qid)
     
     queries = {
         qid: (raw_prompts[qid - 1], texts)
@@ -306,14 +314,14 @@ if __name__ == "__main__":
     logger.info(f"Input File: {input_name}, Prepared {len(queries)} queries for evaluation.")
 
     res = asyncio.run(
-        extract_claims_async(args, queries, max_concurrency=20)
+        extract_claims_async(args, queries, max_concurrency=50)
     )
     view_div = average_unique_claims_per_qid_embedding(res)
     
     final_quality_score = asyncio.run(
-        quality_score_async(args, queries, max_concurrency=20)
+        quality_score_async(args, queries, max_concurrency=30)
     )
-    
+
     lex_div = lexical_diversity(qid_to_texts, max_n=3)
     semantic_div = semantic_diversity_openai(qid_to_texts)
 

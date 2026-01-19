@@ -73,24 +73,23 @@ Existing views:
 {VIEWS}
 
 Task:
-Reflect on the coverage of the existing views and identify ONE new, meaningful direction that is currently missing.
+Reflect on the coverage of the existing views and identify ONE new, meaningful direction
+that explores the original question from a new angle, while preserving its core constraints.
 
 Guidelines:
-- The new direction must be conceptually distinct from the existing views.
-- Do NOT rephrase or refine any existing view.
-- Avoid minor variations or subpoints.
-- Focus on a different perspective, stakeholder, value system, time horizon, or level of abstraction.
+- The new view must remain relevant to answering the original question.
+- The new view must introduce a genuinely different angle without altering the question’s intent or constraints.
+- The new view must be conceptually distinct from the existing views.
 - Do NOT generate a full answer.
 
 Output requirements:
 - Output exactly ONE new view.
-- Use the structured format below.
 - Be concise and precise.
 
 New view format (STRICT):
 {{
-  "label": "...",          # 2-5 words summarizing the new direction
-  "description": "..."    # exactly ONE sentence explaining the new direction
+  "label": "...",          # 2–5 words summarizing the new angle
+  "description": "..."    # exactly ONE sentence explaining how this angle helps address the question
 }}
 """
 
@@ -111,25 +110,37 @@ Answer:
 """
 
 rag_prompt_new_view = """
-Given the following context, identify the relevant information and generate a factually grounded, precise, and non-verbose answer.
-Context:
-{context_str}
+You are answering an open-ended question using the provided context.
 
 Question:
 {query_str}
 
-New view to emphasize:
+View to emphasize:
 - {view_label}: {view_description}
 
-Instructions:
-- Answer the original question.
-- Emphasize insights relevant to the new view.
+Context:
+{context_str}
 
+First, assess whether the context is relevant and useful for answering the question
+from the specified view.
+
+If the context is NOT relevant or off-topic:
+- Ignore the context and answer the question directly based on the Question and the View only.
+
+If the context IS relevant:
+- Ground your answer in the context.
+
+Instructions:
+- Answer the original question explicitly. Do NOT change or reinterpret the question.
+- Frame the answer primarily from the specified view.
+- Do NOT hallucinate facts not implied by the Question or the View.
+- Do NOT mention the relevance of the context; focus solely on answering the question from the specified view.
 Answer:
 """
 
+
 conditioned_query_prompt = """
-Generate ONE search query for document retrieval.
+Generate ONE search query for open web search.
 
 Original query:
 {QUESTION}
@@ -138,17 +149,18 @@ New view:
 {VIEW_LABEL} — {VIEW_DESCRIPTION}
 
 Requirements:
-- Stay close to the original query
-- Highlight the new view
-- Use keywords or short phrases (not a question or sentence)
+- The search query MUST target information that helps answer the original query.
+- Emphasize from the new view without changing the original query’s intent.
+- Be concise, Use only the most essential keywords or short phrases.
+- Provide ONLY the search query text.
 
 Output:
 """
 
 quality_prompt = """
 You are evaluating an answer to an open-ended question.
-There is no single correct answer, an answer may focus on one aspect or
-perspective and still be appropriate.
+There is no single correct answer; instead, many different answers can be valid.
+An answer should be considered good if it is helpful or informative for some readers.
 
 Question:
 {QUESTION}
@@ -167,7 +179,7 @@ Based on these dimensions, assign ONE of the following verdicts:
 - Good: Addresses the question well; mostly accurate with only minor issues.
 - Fair: Addresses the core of the question but has noticeable factual, support, or clarity issues.
 - Poor: Attempts to address the question but is largely incorrect, weakly supported, or unclear.
-- Irrelevant: Does not meaningfully address the question.
+- Irrelevant: The response does not address the question and provides no useful information.
 
 Output MUST be valid JSON in the following format:
 
@@ -220,15 +232,15 @@ Original answer:
 Your task is to produce a refined answer that improves the quality of the original answer while preserving its core content.
 
 Specifically, the refined answer must:
-- Correct or soften any statements that could be factually inaccurate or misleading
+- Correct any statements that could be factually inaccurate or misleading
 - Ensure that claims are reasonably explained or appropriately qualified, rather than asserted without support
 - Be internally consistent and logically coherent
-- Address the original Question directly, grounding the answer in the given perspective while ensuring that the discussion remains connected to the core of the Question rather than focusing on a single narrow aspect.
+- Address the original Question directly, grounding the answer in the given perspective
+- You MAY use the given perspective as an entry point or framing device, but the answer must clearly connect back to and help resolve the original Question rather than remaining at the level of the perspective alone.
 
 Constraints:
 - Do NOT introduce new factual claims beyond what is already implied by the original answer
-- Do NOT mention the word "view" or explicitly describe the perspective
-- Do NOT rephrase or restate the Question
+- Do NOT shift the focus to topics that are not relevant to the original Question
 - Keep the answer concise, focused, and well-structured
 
 Output:
@@ -288,6 +300,16 @@ Rules:
 - Do NOT include numbering, bullet points, or labels inside the answers.
 - Do NOT output anything outside the JSON object.
 """
+
+llm_prompt_multi_turn = """
+You are a response generation assistant for open-ended questions.
+There is no single correct answer.
+Your goal is to generate ONLY ONE plausible answer. DO NOT generate multiple answers at once.
+Question:
+{QUESTION}
+Output:
+"""
+
 vs_prompt = """
 You are a response generation assistant for open-ended questions.
 There is no single correct answer.

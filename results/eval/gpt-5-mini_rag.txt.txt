@@ -1,0 +1,1 @@
+Input File: gpt-5-mini_rag.txt	Lexical Diversity: 0.605	Semantic Diversity: 0.106	View Diversity: 0.467	Quality score: 4.444

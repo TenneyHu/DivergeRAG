@@ -1,4 +1,32 @@
 nohup: ignoring input
 ==============================
-Evaluating gpt-5-mini.txt
+Evaluating gpt-5.1_all.txt
 ==============================
+Task exception was never retrieved
+future: <Task finished name='Task-1845' coro=<AsyncClient.aclose() done, defined at /dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/httpx/_client.py:1978> exception=RuntimeError('Event loop is closed')>
+Traceback (most recent call last):
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/httpx/_client.py", line 1985, in aclose
+    await self._transport.aclose()
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/httpx/_transports/default.py", line 406, in aclose
+    await self._pool.aclose()
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 353, in aclose
+    await self._close_connections(closing_connections)
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/httpcore/_async/connection_pool.py", line 345, in _close_connections
+    await connection.aclose()
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/httpcore/_async/connection.py", line 173, in aclose
+    await self._connection.aclose()
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/httpcore/_async/http11.py", line 258, in aclose
+    await self._network_stream.aclose()
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/httpcore/_backends/anyio.py", line 53, in aclose
+    await self._stream.aclose()
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/anyio/streams/tls.py", line 234, in aclose
+    await self.transport_stream.aclose()
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/anyio/_backends/_asyncio.py", line 1314, in aclose
+    self._transport.close()
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/asyncio/selector_events.py", line 864, in close
+    self._loop.call_soon(self._call_connection_lost, None)
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/asyncio/base_events.py", line 762, in call_soon
+    self._check_closed()
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/asyncio/base_events.py", line 520, in _check_closed
+    raise RuntimeError('Event loop is closed')
+RuntimeError: Event loop is closed

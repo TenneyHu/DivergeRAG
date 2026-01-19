@@ -3,13 +3,9 @@
 INPUT_DIR=./results/baselines
 
 FILES=(
-  gpt-5-mini.txt
-  gpt-5-mini_list.txt
-  gpt-5-mini_mmr.txt
-  gpt-5-mini_rag.txt
-  gpt-5-mini_shuffle.txt
-  gpt-5-mini_vsampling.txt
+  gpt-5.1_all.txt
 )
+  #gpt-5.1_all.txt
 
 for file in "${FILES[@]}"; do
   echo "=============================="

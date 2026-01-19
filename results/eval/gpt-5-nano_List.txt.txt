@@ -1,0 +1,1 @@
+Input File: gpt-5-nano_List.txt	Lexical Diversity: 0.816	Semantic Diversity: 0.509	View Diversity: 0.865	Quality score: 2.780

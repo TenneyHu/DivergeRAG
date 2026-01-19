@@ -1,0 +1,1 @@
+Input File: gpt-5.1_List.txt	Lexical Diversity: 0.761	Semantic Diversity: 0.309	View Diversity: 0.766	Quality score: 4.059

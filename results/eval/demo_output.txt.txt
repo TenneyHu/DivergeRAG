@@ -1,0 +1,1 @@
+Input File: demo_output.txt	Lexical Diversity: 0.725	Semantic Diversity: 0.294	View Diversity: 0.940	Quality score: 4.000

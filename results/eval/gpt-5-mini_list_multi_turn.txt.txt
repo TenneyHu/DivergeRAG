@@ -1,0 +1,1 @@
+Input File: gpt-5-mini_list_multi_turn.txt	Lexical Diversity: 0.616	Semantic Diversity: 0.176	

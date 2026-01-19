@@ -1,0 +1,1 @@
+Input File: test.txt	Lexical Diversity: 0.724	Semantic Diversity: 0.277	View Diversity: 0.825	Quality score: 4.020

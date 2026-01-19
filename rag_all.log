@@ -1,2 +1,58 @@
 nohup: ignoring input
-Starting expand...
+Starting all...
+Traceback (most recent call last):
+  File "/zhome/8d/e/228913/CLAN/DivergeRAG/./src/baselines/rag.py", line 310, in <module>
+    main()
+  File "/zhome/8d/e/228913/CLAN/DivergeRAG/./src/baselines/rag.py", line 300, in main
+    asyncio.run(
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/asyncio/runners.py", line 190, in run
+    return runner.run(main)
+           ^^^^^^^^^^^^^^^^
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/asyncio/runners.py", line 118, in run
+    return self._loop.run_until_complete(task)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/asyncio/base_events.py", line 654, in run_until_complete
+    return future.result()
+           ^^^^^^^^^^^^^^^
+  File "/zhome/8d/e/228913/CLAN/DivergeRAG/./src/baselines/rag.py", line 284, in run_all_queries_async
+    await asyncio.gather(*tasks)
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/concurrent/futures/thread.py", line 58, in run
+    result = self.fn(*self.args, **self.kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/zhome/8d/e/228913/CLAN/DivergeRAG/./src/baselines/rag.py", line 251, in run_one_query
+    results = div.run()
+              ^^^^^^^^^
+  File "/zhome/8d/e/228913/CLAN/DivergeRAG/./src/baselines/rag.py", line 109, in run
+    index_q = self._search(q)
+              ^^^^^^^^^^^^^^^
+  File "/zhome/8d/e/228913/CLAN/DivergeRAG/./src/baselines/rag.py", line 187, in _search
+    index = VectorStoreIndex.from_documents(documents, embed_model=Settings.embed_model)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/llama_index/core/indices/base.py", line 115, in from_documents
+    nodes = run_transformations(
+            ^^^^^^^^^^^^^^^^^^^^
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/llama_index/core/ingestion/pipeline.py", line 101, in run_transformations
+    nodes = transform(nodes, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/llama_index_instrumentation/dispatcher.py", line 335, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/llama_index/core/node_parser/interface.py", line 204, in __call__
+    return self.get_nodes_from_documents(nodes, **kwargs)  # type: ignore
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/llama_index/core/node_parser/interface.py", line 176, in get_nodes_from_documents
+    nodes = self._parse_nodes(documents, show_progress=show_progress, **kwargs)
+            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/llama_index_instrumentation/dispatcher.py", line 335, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/llama_index/core/node_parser/interface.py", line 269, in _parse_nodes
+    splits = self.split_text_metadata_aware(
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/llama_index_instrumentation/dispatcher.py", line 335, in wrapper
+    result = func(*args, **kwargs)
+             ^^^^^^^^^^^^^^^^^^^^^
+  File "/dtu/p1/tianyhu/miniconda3/envs/div/lib/python3.11/site-packages/llama_index/core/node_parser/text/sentence.py", line 160, in split_text_metadata_aware
+    raise ValueError(
+ValueError: Metadata length (590) is longer than chunk size (512). Consider increasing the chunk size or decreasing the size of your metadata to avoid this.
+All jobs finished.

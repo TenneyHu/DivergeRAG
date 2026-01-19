@@ -17,7 +17,7 @@ def parse_args() -> argparse.Namespace:
     p.add_argument("--filename", type=str, default="list", help="Output file name")
     p.add_argument("--llm_model", type=str, default="gpt-5-mini", help="OpenAI model name")
     p.add_argument("--provider", type=str, default="openai", choices=["openai", "claude"], help="LLM provider to use")
-    p.add_argument("--max_concurrency", type=int, default=20, help="Max concurrent requests")
+    p.add_argument("--max_concurrency", type=int, default=40, help="Max concurrent requests")
     p.add_argument("--temperature", type=float, default=None, help="Sampling temperature for LLM")
     return p.parse_args()
 

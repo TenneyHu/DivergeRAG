@@ -1,0 +1,1 @@
+Input File: diverge_results1.txt	Lexical Diversity: 0.716	Semantic Diversity: 0.278	View Diversity: 0.842	Quality score: 4.226

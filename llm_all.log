@@ -1,0 +1,24 @@
+nohup: ignoring input
+Starting all...
+==============================
+Running baselines for gpt-5-nano
+==============================
+[WARN] Failed to parse response for qid=76, trial=0: Expecting value: line 3 column 5 (char 21)
+[WARN] Failed to parse response for qid=35, trial=8: Expecting value: line 3 column 5 (char 21)
+[WARN] Failed to parse response for qid=44, trial=2: Expecting value: line 3 column 5 (char 21)
+[WARN] Failed to parse response for qid=44, trial=4: Expecting value: line 3 column 5 (char 21)
+[WARN] Failed to parse response for qid=50, trial=6: Expecting value: line 3 column 5 (char 21)
+[WARN] Failed to parse response for qid=53, trial=5: Expecting value: line 3 column 5 (char 21)
+[WARN] Failed to parse response for qid=56, trial=7: Expecting value: line 3 column 5 (char 21)
+[WARN] Failed to parse response for qid=76, trial=8: Expecting value: line 3 column 5 (char 21)
+[WARN] Failed to parse response for qid=76, trial=5: Expecting value: line 3 column 5 (char 21)
+[WARN] Failed to parse response for qid=92, trial=1: Expecting value: line 3 column 5 (char 21)
+==============================
+Running baselines for gpt-5.1
+==============================
+[WARN] Failed to parse response for qid=99, trial=0: Invalid control character at: line 3 column 514 (char 530)
+[WARN] Failed to parse response for qid=11, trial=0: Expecting value: line 4 column 15 (char 37)
+[WARN] Failed to parse response for qid=28, trial=0: Expecting value: line 4 column 15 (char 37)
+[WARN] Failed to parse response for qid=46, trial=0: Expecting value: line 4 column 15 (char 37)
+[WARN] Failed to parse response for qid=67, trial=0: Expecting value: line 4 column 15 (char 37)
+[WARN] Failed to parse response for qid=32, trial=8: Unterminated string starting at: line 3 column 5 (char 21)

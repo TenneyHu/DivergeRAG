@@ -1,0 +1,1 @@
+Input File: gpt-5-nano_shuffle.txt	Lexical Diversity: 0.618	Semantic Diversity: 0.120	View Diversity: 0.492	Quality score: 4.408

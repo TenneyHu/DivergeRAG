@@ -1,0 +1,1 @@
+Input File: gpt-5-nano_rag.txt	Lexical Diversity: 0.606	Semantic Diversity: 0.107	View Diversity: 0.470	Quality score: 4.429
